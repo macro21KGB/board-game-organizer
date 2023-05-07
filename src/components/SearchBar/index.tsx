@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import styled from 'styled-components';
-import { FilterButton } from '../FilterButton';
+import FilterButton from '../FilterButton';
 
 const OuterLayer = styled.div`
     display: flex;
@@ -72,8 +73,10 @@ export default function SearchBar() {
 
     const [isExpanded, setIsExpanded] = useState(false);
 
+    const [parent] = useAutoAnimate();
+
     return (
-        <OuterLayer>
+        <OuterLayer ref={parent}>
             <SearchBarContainer>
                 <input type="text" placeholder='Search...' />
                 <button onClick={() => setIsExpanded(!isExpanded)} >{isExpanded ? '-' : '+'}</button>
@@ -81,9 +84,9 @@ export default function SearchBar() {
             {
                 isExpanded &&
                 <FilterContainer>
-                    <FilterButton defaultPlaceholder='How many players?' unit='players' />
-                    <FilterButton defaultPlaceholder='How much time?' range={{ min: 1, max: 2 }} unit='minutes' />
-                    <FilterButton defaultPlaceholder='With a minimium personal score?' />
+                    <FilterButton rangeLimiters={{ min: 1, max: 20 }} defaultPlaceholder='How many players?' unit='players' />
+                    <FilterButton rangeLimiters={{ min: 1, max: 300 }} defaultPlaceholder='How much time?' unit='minutes' />
+                    <FilterButton rangeLimiters={{ min: 1, max: 10 }} step={0.5} defaultPlaceholder='With a minimium personal score?' />
                 </FilterContainer>
             }
             <SearchButton>

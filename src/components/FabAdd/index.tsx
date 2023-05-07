@@ -1,6 +1,11 @@
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import styled from 'styled-components';
+import { Modal } from '../Modal';
 
-const FABContainer = styled.div`
+const FABContainer = styled.button`
+    all: unset;
+
     position: fixed;
     bottom: 1rem;
     right: 1rem;
@@ -35,9 +40,20 @@ const FABContainer = styled.div`
 
 
 export function FABAdd() {
+
+    const [showModal, setShowModal] = useState(false);
+
+
     return (
-        <FABContainer>
-            +
-        </FABContainer>
+        <>
+            {showModal && createPortal(
+                <Modal title='Add new Game' onClose={() => setShowModal(false)}>
+                </Modal>, document.body
+            )
+            }
+            <FABContainer onClick={() => { setShowModal(true) }}>
+                +
+            </FABContainer>
+        </>
     )
 }

@@ -5,7 +5,7 @@ export interface FilterRange {
     max: number;
 }
 
-const gameSchema = z.object({
+export const gameSchema = z.object({
     id: z.number(),
     name: z.string(),
     players: z.object({

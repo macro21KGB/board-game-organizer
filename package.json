@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@formkit/auto-animate": "1.0.0-beta.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.11.1",
     "styled-components": "6.0.0-rc.1",
     "zod": "^3.21.4"
   },
