@@ -9,6 +9,9 @@ micros:
     dev: npm run dev
     serve: dist
     primary: true
+
   - name: backend
     src: ./api
     engine: nodejs16
+    run: node index.js
+    dev: npm run dev

@@ -102,7 +102,7 @@ export default function AddGameRoute() {
         }
 
         try {
-            const parsedGame = gameSchema.parse(newGame);
+            gameSchema.parse(newGame);
             notify("Game added successfully", "success")
             navigate('/');
         } catch (err: any) {
