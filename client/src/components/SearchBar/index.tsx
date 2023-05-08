@@ -60,19 +60,15 @@ const SearchButton = styled.button`
 `;
 
 const FilterContainer = styled.div`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 0.5rem;
 
-    & > *:nth-child(3) {
-        grid-column: 1 / 3;
-    }
 `;
 
 export default function SearchBar() {
 
     const [isExpanded, setIsExpanded] = useState(false);
-
     const [parent] = useAutoAnimate();
 
     return (
@@ -85,7 +81,7 @@ export default function SearchBar() {
                 isExpanded &&
                 <FilterContainer>
                     <FilterButton rangeLimiters={{ min: 1, max: 20 }} defaultPlaceholder='How many players?' unit='players' />
-                    <FilterButton rangeLimiters={{ min: 1, max: 300 }} defaultPlaceholder='How much time?' unit='minutes' />
+                    <FilterButton rangeLimiters={{ min: 5, max: 200 }} step={5} defaultPlaceholder='How much time?' unit='minutes' />
                     <FilterButton rangeLimiters={{ min: 1, max: 10 }} step={0.5} defaultPlaceholder='With a minimium personal score?' />
                 </FilterContainer>
             }

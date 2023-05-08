@@ -7,19 +7,19 @@ export interface FilterRange {
 
 export const gameSchema = z.object({
     id: z.number(),
-    name: z.string(),
+    name: z.string().min(5),
     players: z.object({
         min: z.number().min(1),
         max: z.number().min(1),
     }),
-    playtime: z.object({
+    playTime: z.object({
         min: z.number().min(1),
         max: z.number().min(1),
     }),
-    hasExtensions: z.boolean(),
-    isExtension: z.boolean(),
-    extensions: z.array(z.number()),
-    imageUrl: z.string(),
+    hasExtensions: z.boolean().optional().default(false),
+    isExtension: z.boolean().optional().default(false),
+    extensions: z.array(z.number()).default([]),
+    imageUrl: z.string().nullable().optional().default(null),
     score: z.number().min(1).max(10),
 });
 

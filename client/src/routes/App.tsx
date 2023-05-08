@@ -1,7 +1,7 @@
-import { FABAdd } from './components/FabAdd'
-import { GameCard } from './components/GameCard'
-import SearchBar from './components/SearchBar'
-import { Game } from './utils/interface'
+import { FABAdd } from '../components/FabAdd'
+import { GameCard } from '../components/GameCard'
+import SearchBar from '../components/SearchBar'
+import { Game } from '../utils/interface'
 
 const dummyGame: Game = {
   id: 1,
@@ -16,7 +16,7 @@ const dummyGame: Game = {
   extensions: [
     2, 3, 4
   ],
-  playtime: {
+  playTime: {
     min: 30,
     max: 60
   },

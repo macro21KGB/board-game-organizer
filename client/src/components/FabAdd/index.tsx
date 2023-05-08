@@ -1,7 +1,5 @@
-import { useState } from 'react';
-import { createPortal } from 'react-dom';
 import styled from 'styled-components';
-import { Modal } from '../Modal';
+import { useNavigate } from 'react-router-dom';
 
 const FABContainer = styled.button`
     all: unset;
@@ -41,17 +39,12 @@ const FABContainer = styled.button`
 
 export function FABAdd() {
 
-    const [showModal, setShowModal] = useState(false);
-
+    const navigate = useNavigate();
 
     return (
         <>
-            {showModal && createPortal(
-                <Modal title='Add new Game' onClose={() => setShowModal(false)}>
-                </Modal>, document.body
-            )
-            }
-            <FABContainer onClick={() => { setShowModal(true) }}>
+
+            <FABContainer onClick={() => { navigate("/add") }}>
                 +
             </FABContainer>
         </>

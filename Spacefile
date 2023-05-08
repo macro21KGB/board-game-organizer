@@ -1,0 +1,14 @@
+# Spacefile Docs: https://go.deta.dev/docs/spacefile/v0
+v: 0
+micros:
+  - name: client-app
+    src: ./client
+    engine: static
+    commands:
+        - npm run build
+    dev: npm run dev
+    serve: dist
+    primary: true
+  - name: backend
+    src: ./api
+    engine: nodejs16
