@@ -27,4 +27,7 @@ export default class Controller {
         return this.gameDao.addGame(newGame);
     }
 
+    async addGamePhoto(photo: string, key: string): Promise<ResponsePayload> {
+        return this.gameDao.addGamePhoto(photo, key);
+    }
 }

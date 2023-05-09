@@ -175,13 +175,13 @@ export default function AddGameRoute() {
             hasExtensions,
             isExtension,
             score: parseInt(score),
-            imageUrl: photo,
+            imageUrl: null,
             extensions: []
         }
 
         try {
-            gameSchema.parse(newGame);
-            addGameMutation.mutate(newGame, {
+            const parsedGame = gameSchema.parse(newGame);
+            addGameMutation.mutate(parsedGame, {
                 onSuccess: () => {
                     queryClient.invalidateQueries(["games"]);
                     notify("Game added successfully!", "success");
@@ -191,6 +191,7 @@ export default function AddGameRoute() {
                     notify("Can't add the game right now!", "error");
                 }
             });
+
         } catch (err: any) {
             const validationError = fromZodError(err);
             notify(validationError.message, "error");
@@ -199,16 +200,19 @@ export default function AddGameRoute() {
 
     }
 
+
     const saveAndPreviewPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                if (!photoRef.current) return;
-                setPhoto(e.target?.result as string);
-                photoRef.current.src = e.target?.result as string;
+                if (photoRef.current) {
+                    photoRef.current.src = e.target?.result as string;
+                    setPhoto(e.target?.result as string);
+                }
             }
             reader.readAsDataURL(file);
+            console.log(photo);
         }
     }
 
@@ -254,7 +258,7 @@ export default function AddGameRoute() {
                 </LabelFormControl>
             </div>
 
-            <input type="file" onChange={saveAndPreviewPhoto} />
+            <input type="file" name="photo" onChange={saveAndPreviewPhoto} />
             <PhotoPreview ref={photoRef} src="none" alt="preview" />
         </AddGameContainer>
     )
