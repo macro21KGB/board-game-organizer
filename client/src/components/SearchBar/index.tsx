@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import styled from 'styled-components';
-import FilterButton from '../FilterButton';
 
 const OuterLayer = styled.div`
     display: flex;
@@ -59,33 +57,36 @@ const SearchButton = styled.button`
     }
 `;
 
-const FilterContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+// const FilterContainer = styled.div`
+//     display: flex;
+//     flex-direction: column;
+//     gap: 0.5rem;
 
-`;
+// `;
 
-export default function SearchBar() {
+interface SearchBarProps {
+    onSearch: (search: string) => void;
+}
 
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [parent] = useAutoAnimate();
+export default function SearchBar({ onSearch }: SearchBarProps) {
+
+    const [value, setValue] = useState("");
 
     return (
-        <OuterLayer ref={parent}>
+        <OuterLayer >
             <SearchBarContainer>
-                <input type="text" placeholder='Search...' />
-                <button onClick={() => setIsExpanded(!isExpanded)} >{isExpanded ? '-' : '+'}</button>
+                <input value={value} onChange={(e) => setValue(e.target.value)} type="text" placeholder='Search...' />
+                {/* <button onClick={() => setIsExpanded(!isExpanded)} >{isExpanded ? '-' : '+'}</button> */}
             </SearchBarContainer>
-            {
+            {/* {
                 isExpanded &&
                 <FilterContainer>
                     <FilterButton rangeLimiters={{ min: 1, max: 20 }} defaultPlaceholder='How many players?' unit='players' />
                     <FilterButton rangeLimiters={{ min: 5, max: 200 }} step={5} defaultPlaceholder='How much time?' unit='minutes' />
                     <FilterButton rangeLimiters={{ min: 1, max: 10 }} step={0.5} defaultPlaceholder='With a minimium personal score?' />
                 </FilterContainer>
-            }
-            <SearchButton>
+            } */}
+            <SearchButton onClick={() => { onSearch(value) }}>
                 Search
             </SearchButton>
         </OuterLayer>

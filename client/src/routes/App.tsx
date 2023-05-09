@@ -1,35 +1,52 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { FABAdd } from '../components/FabAdd'
 import { GameCard } from '../components/GameCard'
 import SearchBar from '../components/SearchBar'
 import { Game } from '../utils/interface'
+import styled from 'styled-components'
+import Controller from '../controller'
+import { useState } from 'react'
 
-const dummyGame: Game = {
-  id: 1,
-  name: "Dummy Game",
-  imageUrl: "https://via.placeholder.com/120",
-  hasExtensions: true,
-  isExtension: false,
-  players: {
-    min: 2,
-    max: 4
-  },
-  extensions: [
-    2, 3, 4
-  ],
-  playTime: {
-    min: 30,
-    max: 60
-  },
-  score: 7.5,
-}
+const GamesList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+`;
+
 
 function App() {
+  const controller = Controller.getInstance();
+  const [currentFilter, setCurrentFilter] = useState<string>("")
+  const queryClient = useQueryClient();
+  const queryGames = useQuery<Game[]>(["games", currentFilter], async () => {
+    const games = await controller.getGames(currentFilter)
+    return games
+  });
+
+  const onSearch = (search: string) => {
+    setCurrentFilter(search)
+    queryClient.invalidateQueries(["games", currentFilter])
+  }
 
   return (
     <>
-      <SearchBar />
+      <SearchBar onSearch={onSearch} />
       <br />
-      <GameCard game={dummyGame} />
+      <GamesList>
+        {queryGames.isLoading && <p>Loading...</p>}
+        {queryGames.data &&
+          queryGames.data?.map(game => {
+            if (!game) return null
+            if (currentFilter != "") {
+              if (game.name.toLowerCase().includes(currentFilter.toLowerCase())) {
+                return (<GameCard key={game.key} game={game} />)
+              }
+            }
+
+            return (<GameCard key={game.key} game={game} />)
+          })
+        }
+      </GamesList>
       <FABAdd />
     </>
   )

@@ -2,7 +2,7 @@
 v: 0
 micros:
   - name: client-app
-    src: ./client
+    src: client
     engine: static
     commands:
         - npm run build
@@ -11,7 +11,8 @@ micros:
     primary: true
 
   - name: backend
-    src: ./api
+    src: api
+    path: api
     engine: nodejs16
     run: node index.js
     dev: npm run dev

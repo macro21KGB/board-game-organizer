@@ -5,9 +5,32 @@ export interface FilterRange {
     max: number;
 }
 
+export interface ResponsePayload {
+    success: boolean,
+    message: string
+}
+
+export const filterMapSchema = z.object({
+    players: z.object({
+        min: z.number().min(1),
+        max: z.number().min(1),
+    }),
+    playTime: z.object({
+        min: z.number().min(1),
+        max: z.number().min(1),
+    }),
+    score: z.object({
+        min: z.number().min(1),
+        max: z.number().min(1),
+    }),
+});
+
+export type FilterMap = z.infer<typeof filterMapSchema>;
+
 export const gameSchema = z.object({
-    id: z.number(),
-    name: z.string().min(5),
+    key: z.string(),
+    name: z.string().min(2),
+    slug: z.string().min(2),
     players: z.object({
         min: z.number().min(1),
         max: z.number().min(1),

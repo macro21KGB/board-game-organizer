@@ -12,6 +12,7 @@
   "dependencies": {
     "@formkit/auto-animate": "1.0.0-beta.6",
     "@tanstack/react-query": "^4.29.5",
+    "nanoid": "^4.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.1",
