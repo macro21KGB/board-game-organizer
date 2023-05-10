@@ -7,7 +7,6 @@ const GameCardContainer = styled.div`
     flex-direction: row;
     justify-content: flex-start;
     gap: 0.5rem;
-    min-height: 120px;
     background-color: ${props => props.theme.backgroundCardColor};
     border-radius: 8px;
 
@@ -85,7 +84,8 @@ interface GameCardProps {
 
 export function GameCard({ game }: GameCardProps) {
 
-    const { name, imageUrl, score, players, playTime, hasExtensions, extensions, isExtension } = game;
+    const { name, score, players, playTime, hasExtensions, extensions, isExtension } = game;
+
 
     return (
         <GameCardContainer>
@@ -95,7 +95,7 @@ export function GameCard({ game }: GameCardProps) {
             }
 
             <ScoreBadge>{score}</ScoreBadge>
-            <img src={imageUrl ?? "http://placeholder.com/150"} alt="Game Cover" width={150} height={150} />
+            {/* <img src="http://placeholder.com/150" alt="Game Cover" width={150} height={150} /> */}
             <InfoContainer>
                 <h3>{name}</h3>
                 <p>

@@ -4,7 +4,7 @@ import axios from "axios";
 interface GameDao {
     getGame(gameId: string): Promise<Game>;
     getGames(): Promise<Game[]>;
-    addGame(game: Game): Promise<ResponsePayload>;
+    addGame(data: FormData): Promise<ResponsePayload>;
     addGamePhoto(photo: string, key: string): Promise<ResponsePayload>;
     updateGame(game: Game): Promise<Game>;
     deleteGame(gameId: string): Promise<Game>;
@@ -26,31 +26,19 @@ export class GameDaoDetaImpl implements GameDao {
             }
         })
 
-        const data = await response.json() as { items: Game[] };
-        return data.items;
+        const data = await response.json() as Game[];
+        return data;
     }
-    async addGame(game: Game): Promise<ResponsePayload> {
-        const payloadToSend = {
-            game: {
-                ...game,
-                imageUrl: null
-            }
-        }
-        const response = await fetch(`${GameDaoDetaImpl.SERVER_URL}/game`, {
-            method: 'POST',
-            body: JSON.stringify(payloadToSend),
+    async addGame(data: FormData): Promise<ResponsePayload> {
+        const response = await axios.post<ResponsePayload>(`${GameDaoDetaImpl.SERVER_URL}/game`, data, {
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "multipart/form-data"
             }
         })
 
-        const data = await response.json() as ResponsePayload;
+        const dataResponse = response.data;
 
-        if (!data.success) {
-            throw new Error("Error adding game");
-        }
-
-        return data;
+        return dataResponse;
     }
 
     async addGamePhoto(photo: string, key: string): Promise<ResponsePayload> {

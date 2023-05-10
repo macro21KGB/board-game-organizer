@@ -12,6 +12,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Controller from "../controller"
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
+//@ts-ignore
+import imageCompression from 'browser-image-compression';
+
 const AddGameContainer = styled.div`
     position: relative;
     display: flex;
@@ -134,7 +137,7 @@ export default function AddGameRoute() {
 
     const [gameName, setGameName] = useState<string>('');
     const photoRef = useRef<HTMLImageElement | null>(null);
-    const [photo, setPhoto] = useState<string | null>(null);
+    const [photo, setPhoto] = useState<Blob | File | null>(null);
     const [score, setScore] = useState<string>("");
     const [hasExtensions, setHasExtensions] = useState<boolean>(false);
     const [isExtension, setIsExtension] = useState<boolean>(false);
@@ -146,8 +149,8 @@ export default function AddGameRoute() {
 
     const [parentTogglers] = useAutoAnimate();
 
-    const addGameMutation = useMutation((newGame: Game) => {
-        return controller.addGame(newGame);
+    const addGameMutation = useMutation((data: FormData) => {
+        return controller.addGame(data);
     });
 
     const tryToAddGame = () => {
@@ -181,11 +184,15 @@ export default function AddGameRoute() {
 
         try {
             const parsedGame = gameSchema.parse(newGame);
-            addGameMutation.mutate(parsedGame, {
+            const formData = new FormData();
+
+            formData.set("game", JSON.stringify(parsedGame));
+            formData.set("photo", photo as Blob);
+            addGameMutation.mutate(formData, {
                 onSuccess: () => {
                     queryClient.invalidateQueries(["games"]);
                     notify("Game added successfully!", "success");
-                    navigate("/");
+                    // navigate("/");
                 },
                 onError: () => {
                     notify("Can't add the game right now!", "error");
@@ -201,14 +208,21 @@ export default function AddGameRoute() {
     }
 
 
-    const saveAndPreviewPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const saveAndPreviewPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
+
+            const compressedPhoto = await imageCompression(file, {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 500,
+            })
+            console.log(compressedPhoto);
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 if (photoRef.current) {
                     photoRef.current.src = e.target?.result as string;
-                    setPhoto(e.target?.result as string);
+                    setPhoto(file);
                 }
             }
             reader.readAsDataURL(file);

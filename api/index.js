@@ -3,10 +3,12 @@ const { gamesDb, photoGamesDb } = require("./deta.js");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
+const multer = require("multer");
+const bodyParser = require("body-parser");
 
 app.use(cors())
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 app.get("/", (req, res) => {
@@ -15,51 +17,38 @@ app.get("/", (req, res) => {
 
 
 // ADD GAME
-app.post("/game", async (req, res) => {
-    console.log(req.body);
-    if (!req.body['game'])
-        res.status(400).send({ success: false, message: "Bad request" });
+app.post("/game", multer().single("photo"), async (req, res) => {
+    try {
+        const game = JSON.parse(req.body['game']);
+        const fileToUpload = req.file;
 
-    const currentGame = req.body['game'];
+        gamesDb.put(game);
+        photoGamesDb.put(game.key, { data: fileToUpload.buffer });
 
-    await gamesDb.put(currentGame);
-    res.status(200).send({ success: true, message: "Game created" })
-});
+        res.status(200).send({ success: true, message: "Game created" })
 
-// ADD PHOTO GAME
-app.post("/game/photo", async (req, res) => {
-
-    if (!req.body || !req.query['key']) {
-        res.status(400).send({ success: false, message: "Bad request" });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ success: false, message: "Error creating game" })
     }
 
-    const photoBlob = req.body;
-    const key = req.query['key'];
-
-    await photoGamesDb.put(key, { data: photoBlob });
-    res.status(200).send({ success: true, message: "Game updated" })
 });
-
 
 app.get("/games", async (req, res) => {
+
+    /**
+    * @type {Array} games
+    */
+    let games = [];
+
     if (req.query['name']) {
         console.log(req.query['name']);
-
-        /**
-         * @type {Array}
-         */
-        const games = await gamesDb.fetch({ "slug?contains": req.query['name'] });
-
-        games.map(async (game) => {
-            const imageUrl = await photoGamesDb.get(game.key);
-            game.imageUrl = imageUrl;
-        })
-
-        res.status(200).send(games);
-        return;
+        games = (await gamesDb.fetch({ "slug?contains": req.query['name'] })).items;
+    }
+    else {
+        games = (await gamesDb.fetch()).items;
     }
 
-    const games = await gamesDb.fetch();
     res.send(games);
 });
 

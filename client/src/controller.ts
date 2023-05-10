@@ -23,8 +23,8 @@ export default class Controller {
         return await this.gameDao.getGames(filterName);
     }
 
-    async addGame(newGame: Game): Promise<ResponsePayload> {
-        return this.gameDao.addGame(newGame);
+    async addGame(data: FormData): Promise<ResponsePayload> {
+        return this.gameDao.addGame(data);
     }
 
     async addGamePhoto(photo: string, key: string): Promise<ResponsePayload> {
