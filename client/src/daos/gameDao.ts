@@ -1,25 +1,37 @@
 import { Game, ResponsePayload } from "../utils/interface";
 import axios from "axios";
+import { getBaseUrl } from "../utils/utils";
 
 interface GameDao {
     getGame(gameId: string): Promise<Game>;
     getGames(): Promise<Game[]>;
     addGame(data: FormData): Promise<ResponsePayload>;
-    addGamePhoto(photo: string, key: string): Promise<ResponsePayload>;
+    getPhoto(gameKey: string): Promise<string>;
     updateGame(game: Game): Promise<Game>;
     deleteGame(gameId: string): Promise<Game>;
 }
 
 export class GameDaoDetaImpl implements GameDao {
-    public static SERVER_URL = "http://localhost:4200/api";
 
+    async getGame(gameId: string): Promise<Game> {
+        try {
+            const response = axios.get<Game | string>(`${getBaseUrl()}/game/${gameId}`, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
 
-    getGame(gameId: string): Promise<Game> {
-        console.log(gameId);
-        throw new Error("Method not implemented.");
+            const data = (await response).data;
+
+            if (data === null || data === "") throw new Error("Game not found");
+
+            return data as Game;
+        } catch (error: any) {
+            throw new Error(error);
+        }
     }
     async getGames(filterName?: string): Promise<Game[]> {
-        const response = await fetch(`${GameDaoDetaImpl.SERVER_URL}/games${filterName !== "" ? `?name=${filterName}` : ""}`, {
+        const response = await fetch(`${getBaseUrl()}/games${filterName !== "" ? `?name=${filterName}` : ""}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -30,7 +42,7 @@ export class GameDaoDetaImpl implements GameDao {
         return data;
     }
     async addGame(data: FormData): Promise<ResponsePayload> {
-        const response = await axios.post<ResponsePayload>(`${GameDaoDetaImpl.SERVER_URL}/game`, data, {
+        const response = await axios.post<ResponsePayload>(`${getBaseUrl()}/game`, data, {
             headers: {
                 "Content-Type": "multipart/form-data"
             }
@@ -41,18 +53,21 @@ export class GameDaoDetaImpl implements GameDao {
         return dataResponse;
     }
 
-    async addGamePhoto(photo: string, key: string): Promise<ResponsePayload> {
+    async getPhoto(gameKey: string): Promise<string> {
+        try {
+            const response = await axios.get<Blob>(`${getBaseUrl()}/photo/${gameKey}`);
 
-        const payloadToSend = new FormData();
-        payloadToSend.append('photo', photo);
+            const data: any = response.data;
 
-        const responsePhoto = await axios.post<ResponsePayload>(`${GameDaoDetaImpl.SERVER_URL}/game/photo?key=${key}`, {
-            payloadToSend
-        })
+            const b64Image = data.toString('base64');
+            const imgSrc = `data:image/jpeg;base64,${b64Image}`;
+            console.log(imgSrc);
+            return imgSrc;
 
-        const dataPhoto = responsePhoto.data;
-
-        return dataPhoto;
+        } catch (err) {
+            console.log(err);
+            return "";
+        }
     }
 
     updateGame(game: Game): Promise<Game> {

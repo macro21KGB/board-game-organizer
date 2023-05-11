@@ -152,6 +152,8 @@ export default function FilterButton({ defaultPlaceholder, onRangeSelected, onCl
     const [selectingFilter, setSelectingFilter] = useState(false);
 
     const [currentRange, setCurrentRange] = useState<FilterRange | undefined>(range);
+
+    // this is the range that the user is currently selecting
     const [selectorRanges, setSelectorRanges] = useState<FilterRange>(rangeLimiters);
     const [parent] = useAutoAnimate();
 
@@ -159,7 +161,7 @@ export default function FilterButton({ defaultPlaceholder, onRangeSelected, onCl
         onClick?.();
         setSelectingFilter(true);
     }
-
+    
     const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSelectorRanges({ ...selectorRanges, [e.target.name]: parseInt(e.target.value) });
     }
@@ -183,9 +185,9 @@ export default function FilterButton({ defaultPlaceholder, onRangeSelected, onCl
                 selectingFilter &&
                 <FilterOptions >
                     <p>Min: {selectorRanges.min}</p>
-                    <InputRangeItem onChange={handleFilterChange} name="min" type="range" min={rangeLimiters.min} max={rangeLimiters.max} step={step ?? 1} />
+                    <InputRangeItem value={selectorRanges?.min} onChange={handleFilterChange} name="min" type="range" min={rangeLimiters.min} max={rangeLimiters.max} step={step ?? 1} />
                     <p>Max: {selectorRanges.max}</p>
-                    <InputRangeItem onChange={handleFilterChange} name="max" type="range" min={rangeLimiters.min} max={rangeLimiters.max} step={step ?? 1} />
+                    <InputRangeItem value={selectorRanges?.max} onChange={handleFilterChange} name="max" type="range" min={rangeLimiters.min} max={rangeLimiters.max} step={step ?? 1} />
                     <SearchButton onClick={handleSave}>Save</SearchButton>
                 </FilterOptions>
             }

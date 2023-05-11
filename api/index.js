@@ -20,10 +20,13 @@ app.get("/", (req, res) => {
 app.post("/game", multer().single("photo"), async (req, res) => {
     try {
         const game = JSON.parse(req.body['game']);
-        const fileToUpload = req.file;
+
+        const fileToUpload = req.file ?? null;
 
         gamesDb.put(game);
-        photoGamesDb.put(game.key, { data: fileToUpload.buffer });
+
+        if (fileToUpload !== null)
+            photoGamesDb.put(game.key, { data: fileToUpload.buffer });
 
         res.status(200).send({ success: true, message: "Game created" })
 
@@ -32,6 +35,24 @@ app.post("/game", multer().single("photo"), async (req, res) => {
         res.status(500).send({ success: false, message: "Error creating game" })
     }
 
+});
+
+app.get("/photo/:key", async (req, res) => {
+    const photo = await photoGamesDb.get(req.params.key);
+
+    if (photo === null) {
+        res.status(404).send("Photo not found");
+        return;
+    }
+
+    const buffer = Buffer.from(await photo.arrayBuffer(), "base64");
+
+    res.writeHead(200, {
+        "Content-Type": "image/png",
+        "Content-Length": buffer.length,
+    });
+
+    res.end(buffer);
 });
 
 app.get("/games", async (req, res) => {

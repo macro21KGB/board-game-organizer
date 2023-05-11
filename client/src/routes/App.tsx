@@ -6,6 +6,7 @@ import { Game } from '../utils/interface'
 import styled from 'styled-components'
 import Controller from '../controller'
 import { useState } from 'react'
+import LoaderSpinner from '../components/LoaderSpinner'
 
 const GamesList = styled.div`
   display: flex;
@@ -18,6 +19,7 @@ function App() {
   const controller = Controller.getInstance();
   const [currentFilter, setCurrentFilter] = useState<string>("")
   const queryClient = useQueryClient();
+
   const queryGames = useQuery<Game[]>(["games", currentFilter], async () => {
     const games = await controller.getGames(currentFilter)
     return games
@@ -33,7 +35,11 @@ function App() {
       <SearchBar onSearch={onSearch} />
       <br />
       <GamesList>
-        {queryGames.isLoading && <p>Loading...</p>}
+        {queryGames.isLoading &&
+          <div style={{ display: "grid", "placeContent": "center" }}>
+            <LoaderSpinner />
+          </div>
+        }
         {queryGames.data &&
           queryGames.data?.map(game => {
             if (!game) return null
@@ -42,7 +48,6 @@ function App() {
                 return (<GameCard key={game.key} game={game} />)
               }
             }
-
             return (<GameCard key={game.key} game={game} />)
           })
         }

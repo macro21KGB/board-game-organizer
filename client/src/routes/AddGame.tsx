@@ -187,7 +187,9 @@ export default function AddGameRoute() {
             const formData = new FormData();
 
             formData.set("game", JSON.stringify(parsedGame));
-            formData.set("photo", photo as Blob);
+
+            if (photo)
+                formData.set("photo", photo as Blob);
             addGameMutation.mutate(formData, {
                 onSuccess: () => {
                     queryClient.invalidateQueries(["games"]);
@@ -216,13 +218,12 @@ export default function AddGameRoute() {
                 maxSizeMB: 1,
                 maxWidthOrHeight: 500,
             })
-            console.log(compressedPhoto);
-
+            setPhoto(compressedPhoto);
             const reader = new FileReader();
             reader.onload = (e) => {
                 if (photoRef.current) {
                     photoRef.current.src = e.target?.result as string;
-                    setPhoto(file);
+
                 }
             }
             reader.readAsDataURL(file);

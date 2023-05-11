@@ -15,6 +15,8 @@ import {
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import DetailRoute from './routes/DetailsRoute.tsx'
+import Controller from './controller.ts'
 
 const theme = {
   green: '#2A9D8F',
@@ -32,6 +34,20 @@ const router = createBrowserRouter([
     path: "/add",
     element: <AddGameRoute />,
   },
+  {
+    path: "/details/:key",
+    element: <DetailRoute />,
+    loader: ({ params }) => {
+      const controller = Controller.getInstance();
+
+      if (!params.key) throw new Error("Key not found")
+      try {
+        return controller.getGame(params.key)
+      } catch (error) {
+        return null;
+      }
+    }
+  }
 ]);
 
 const queryClient = new QueryClient();
