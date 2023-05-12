@@ -1,5 +1,5 @@
 import { GameDaoDetaImpl } from './daos/gameDao';
-import type { Game, ResponsePayload } from './utils/interface';
+import type { ExtensionType, Game, ResponsePayload } from './utils/interface';
 
 export default class Controller {
 
@@ -35,4 +35,14 @@ export default class Controller {
         return this.gameDao.addGame(data);
     }
 
+    public async getGameExtensions(gameId: string): Promise<ExtensionType[]> {
+        return await this.gameDao.getGameExtensions(gameId);
+    }
+    public async getAllExtensions(): Promise<ExtensionType[]> {
+        return await this.gameDao.getAllExtensions();
+    }
+
+    public async addExtension(gameId: string, extensionId: string): Promise<ResponsePayload> {
+        return await this.gameDao.addExtensionToGame(gameId, extensionId);
+    }
 }

@@ -1,17 +1,10 @@
-import { Game, ResponsePayload } from "../utils/interface";
+import { ExtensionType, Game, ResponsePayload } from "../utils/interface";
 import axios from "axios";
 import { getBaseUrl } from "../utils/utils";
 
-interface GameDao {
-    getGame(gameId: string): Promise<Game>;
-    getGames(): Promise<Game[]>;
-    addGame(data: FormData): Promise<ResponsePayload>;
-    getPhoto(gameKey: string): Promise<string>;
-    updateGame(game: Game): Promise<Game>;
-    deleteGame(gameId: string): Promise<Game>;
-}
 
-export class GameDaoDetaImpl implements GameDao {
+export class GameDaoDetaImpl {
+
 
     async getGame(gameId: string): Promise<Game> {
         try {
@@ -78,4 +71,41 @@ export class GameDaoDetaImpl implements GameDao {
         console.log(gameId);
         throw new Error("Method not implemented.");
     }
+
+    async getGameExtensions(gameId: string): Promise<ExtensionType[]> {
+        try {
+            const response = await axios.get<ExtensionType[]>(`${getBaseUrl()}/extensions/${gameId}`);
+
+            const data = response.data;
+
+            return data;
+        } catch (error: any) {
+            throw new Error(error);
+        }
+    }
+
+    async getAllExtensions(): Promise<ExtensionType[]> {
+        try {
+            const response = await axios.get<ExtensionType[]>(`${getBaseUrl()}/extensions`);
+
+            const data = response.data;
+
+            return data;
+        } catch (error: any) {
+            throw new Error(error);
+        }
+    }
+
+    async addExtensionToGame(gameId: string, extensionId: string): Promise<ResponsePayload> {
+        try {
+            const response = await axios.post<ResponsePayload>(`${getBaseUrl()}/extensions/${gameId}/${extensionId}`);
+
+            const data = response.data;
+
+            return data;
+        } catch (error: any) {
+            throw new Error(error);
+        }
+    }
+
 }

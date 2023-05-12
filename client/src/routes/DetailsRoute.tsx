@@ -1,6 +1,10 @@
-import { useLoaderData, useNavigate } from "react-router-dom"
+import { Link, useLoaderData, useNavigate } from "react-router-dom"
 import { Game } from "../utils/interface";
 import styled from "styled-components";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Controller from "../controller";
+import { toast } from "react-toastify";
 
 const DetailContainer = styled.div`
     position: relative;
@@ -42,7 +46,7 @@ const PillContainer = styled.div`
     background-color: rgb(26, 50, 99);
 
     border-radius: 10px;
-    width: fit-content;
+
     min-width: 100px;
     padding: 0.5rem 0.5rem;
 
@@ -71,20 +75,100 @@ const ExtensionBadge = styled.div`
 const ExtensionSection = styled.div`
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 0.6rem;
+
+    a {
+        text-decoration: none;
+        color: white;
+        background-color: #334B7E;
+        padding: 0.5rem 0.5rem;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+    }
 `;
 
+
+const BasicButton = styled.button<{ bgcolor?: string }>`
+    all: unset;
+
+    background-color: ${props => props.bgcolor ? props.bgcolor : props.theme.green};
+
+    padding: 0.5rem 0.5rem;
+
+    border-radius: 7px;
+
+    text-align: center;
+    font-weight: bold;
+    color: white;
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: filter(brightness(1.2));
+    }
+
+    &:active {
+        background-color: filter(brightness(0.8));
+    }
+`;
 
 export default function DetailRoute() {
 
     const game = useLoaderData() as Game;
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const goBack = () => {
         navigate(-1);
     }
 
-    const { playTime, players, name, extensions, isExtension } = game;
+    const [isAddingExtension, setIsAddingExtension] = useState(false);
+    const [extensionId, setExtensionId] = useState("");
+
+    const controller = Controller.getInstance();
+
+    const allExtensionsQuery = useQuery(["allExtensions"], () => {
+        return controller.getAllExtensions();
+    }, {
+        enabled: isAddingExtension
+    })
+
+    const addExtensionMutation = useMutation((extensionId: string) => {
+        return controller.addExtension(game.key, extensionId)
+    }, {
+        onSuccess: () => {
+            toast.success("Extension added");
+            setIsAddingExtension(false);
+            queryClient.invalidateQueries(["games"]);
+        },
+        onError: (error: any) => {
+            toast.error(error.message);
+        }
+
+    });
+
+    const addExtensionToGame = (extensionId: string) => {
+        let extensionAlreadyAdded = false;
+        if (extensionId === "") {
+            toast.error("Please select an extension");
+            return;
+        }
+
+        game.extensions.forEach((extension) => {
+            if (extension.key === extensionId) {
+                toast.error("Extension already added");
+                extensionAlreadyAdded = true;
+                return;
+            }
+        })
+
+        if (!extensionAlreadyAdded)
+            addExtensionMutation.mutate(extensionId);
+    }
+
+    const { playTime, players, name, extensions, isExtension, hasExtensions } = game;
 
     return (
         <DetailContainer>
@@ -99,7 +183,7 @@ export default function DetailRoute() {
                         </svg>
                     </button>
                     {
-                        !isExtension &&
+                        isExtension &&
                         <ExtensionBadge>Extension</ExtensionBadge>
                     }
                 </div>
@@ -133,11 +217,47 @@ export default function DetailRoute() {
                 </PillContainer>
             </div>
             {
-                extensions.length > 0 &&
-                <ExtensionSection>
-                    <h3>Extensions</h3>
-                </ExtensionSection>
+                hasExtensions &&
+                <>
+                    <ExtensionSection>
+                        <h3>Extensions</h3>
+                        {
+                            game.extensions.map((extension) => {
+                                return (
+                                    <Link key={extension.key} to={`/details/${extension.key}`}>
+                                        {extension.name}
+                                    </Link>
+                                )
+                            })
+                        }
+                    </ExtensionSection>
+                    <BasicButton onClick={() => {
+                        if (isAddingExtension) {
+                            addExtensionToGame(extensionId);
+                        }
+                        else {
+                            setIsAddingExtension(true)
+                        }
+                    }}>
+                        {isAddingExtension ? "Confirm" : "Add extension"}
+                    </BasicButton>
+
+                </>
             }
+            {
+                isAddingExtension &&
+                <select onChange={(e) => setExtensionId(e.target.value)}>
+                    <option value="">Select an extension</option>
+                    {
+                        allExtensionsQuery.data?.map((extension) => {
+                            return (
+                                <option key={extension.key} value={extension.key}>{extension.name}</option>
+                            )
+                        })
+                    }
+                </select>
+            }
+
         </DetailContainer>
     )
 }

@@ -17,6 +17,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DetailRoute from './routes/DetailsRoute.tsx'
 import Controller from './controller.ts'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const theme = {
   green: '#2A9D8F',
@@ -58,6 +59,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <ToastContainer />
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ThemeProvider>
   </React.StrictMode>,

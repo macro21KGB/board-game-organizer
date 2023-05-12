@@ -39,20 +39,11 @@ app.post("/game", multer().single("photo"), async (req, res) => {
 
 app.get("/photo/:key", async (req, res) => {
     const photo = await photoGamesDb.get(req.params.key);
+    if (!photo) res.status(404).send({ success: false, message: "Photo not found" });
 
-    if (photo === null) {
-        res.status(404).send("Photo not found");
-        return;
-    }
+    const buffer = await img.arrayBuffer();
+    res.send(Buffer.from(buffer));
 
-    const buffer = Buffer.from(await photo.arrayBuffer(), "base64");
-
-    res.writeHead(200, {
-        "Content-Type": "image/png",
-        "Content-Length": buffer.length,
-    });
-
-    res.end(buffer);
 });
 
 app.get("/games", async (req, res) => {
@@ -73,9 +64,40 @@ app.get("/games", async (req, res) => {
     res.send(games);
 });
 
+app.get("/extensions", async (req, res) => {
+    const extensions = (await gamesDb.fetch({ "isExtension": true })).items;
+
+    res.send(extensions);
+});
+
+
+// GET GAME
 app.get("/game/:id", async (req, res) => {
+
+    /**
+     * @type {{extensions: string[]}} game
+     */
     const game = await gamesDb.get(req.params.id);
+
+    if (!game) res.status(404).send({ success: false, message: "Game not found" });
+
     res.send(game);
+});
+
+app.post("/extensions/:gameId/:extensionId", async (req, res) => {
+    const game = await gamesDb.get(req.params.gameId);
+    const extension = await gamesDb.get(req.params.extensionId);
+
+    if (!game || !extension) res.status(404).send({ success: false, message: "Game or extension not found" });
+
+    game.extensions.push({
+        key: extension.key,
+        name: extension.name,
+    });
+
+    gamesDb.put(game);
+
+    res.status(200).send({ success: true, message: "Extension added" });
 });
 
 app.listen(port, () => {

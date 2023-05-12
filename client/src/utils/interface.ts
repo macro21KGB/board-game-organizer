@@ -5,6 +5,9 @@ export interface FilterRange {
     max: number;
 }
 
+
+export type ExtensionType = Pick<Game, "key" | "name" | "slug" | "score" | "imageUrl">;
+
 export interface ResponsePayload {
     success: boolean,
     message: string
@@ -41,7 +44,7 @@ export const gameSchema = z.object({
     }),
     hasExtensions: z.boolean().optional().default(false),
     isExtension: z.boolean().optional().default(false),
-    extensions: z.array(z.number()).default([]),
+    extensions: z.array(z.object({ name: z.string(), key: z.string() })).default([]),
     imageUrl: z.any().optional().nullable().default(null),
     score: z.number().min(1).max(10),
 });
