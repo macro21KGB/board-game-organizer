@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { FABAdd } from '../components/FabAdd'
+import { FABButton } from '../components/FabAdd'
 import { GameCard } from '../components/GameCard'
 import SearchBar from '../components/SearchBar'
 import { Game } from '../utils/interface'
@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import Controller from '../controller'
 import { useState } from 'react'
 import LoaderSpinner from '../components/LoaderSpinner'
+import { useNavigate } from 'react-router-dom'
 
 const GamesList = styled.div`
   display: flex;
@@ -19,6 +20,7 @@ function App() {
   const controller = Controller.getInstance();
   const [currentFilter, setCurrentFilter] = useState<string>("")
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const queryGames = useQuery<Game[]>(["games", currentFilter], async () => {
     const games = await controller.getGames(currentFilter)
@@ -28,6 +30,10 @@ function App() {
   const onSearch = (search: string) => {
     setCurrentFilter(search)
     queryClient.invalidateQueries(["games", currentFilter])
+  }
+
+  const navigateToDetails = () => {
+    navigate("/add")
   }
 
   return (
@@ -52,7 +58,7 @@ function App() {
           })
         }
       </GamesList>
-      <FABAdd />
+      <FABButton onClick={navigateToDetails} />
     </>
   )
 }

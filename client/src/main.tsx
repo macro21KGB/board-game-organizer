@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './routes/App.tsx'
+import App from './routes/Dashboard.tsx'
 import './global.css'
 import { ThemeProvider } from 'styled-components'
 import {
@@ -34,6 +34,11 @@ const router = createBrowserRouter([
   {
     path: "/add",
     element: <AddGameRoute />,
+    loader: (props) => {
+      console.log(props)
+
+      return null;
+    }
   },
   {
     path: "/details/:key",

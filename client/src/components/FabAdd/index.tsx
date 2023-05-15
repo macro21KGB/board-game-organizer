@@ -1,14 +1,13 @@
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 
-const FABContainer = styled.button`
+const FABContainer = styled.button<{ backgroundFabColor?: string }>`
     all: unset;
 
     position: fixed;
     bottom: 1rem;
     right: 1rem;
 
-    background-color: ${props => props.theme.backgroundFabColor};
+    background-color: ${props => props.backgroundFabColor ?? props.theme.backgroundFabColor};
 
     width: 3.5rem;
     height: 3.5rem;
@@ -37,15 +36,25 @@ const FABContainer = styled.button`
 `;
 
 
-export function FABAdd() {
+interface FABButtonProps {
+    onClick: () => void
+    backgroundFabColor?: string
+    icon?: "add" | "modify" | "delete"
+}
 
-    const navigate = useNavigate();
+export function FABButton({ onClick, backgroundFabColor, icon = "add" }: FABButtonProps) {
+
+    const icons = {
+        add: "+",
+        modify: "✏️",
+        delete: "🗑️"
+    }
 
     return (
         <>
 
-            <FABContainer onClick={() => { navigate("/add") }}>
-                +
+            <FABContainer backgroundFabColor={backgroundFabColor} onClick={onClick}>
+                {icons[icon]} {/* 🗑️ ✏️ ➕ */}
             </FABContainer>
         </>
     )

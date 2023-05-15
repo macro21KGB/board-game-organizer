@@ -97,7 +97,6 @@ export function GameCard({ game }: GameCardProps) {
                 }
 
                 <ScoreBadge>{score}</ScoreBadge>
-                {/* <img src="http://placeholder.com/150" alt="Game Cover" width={150} height={150} /> */}
                 <InfoContainer>
                     <h3>{name}</h3>
                     <p>

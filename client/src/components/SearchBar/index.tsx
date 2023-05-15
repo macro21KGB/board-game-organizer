@@ -72,20 +72,17 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
 
     const [value, setValue] = useState("");
 
+    const handleOnEnter = (key: string) => {
+        if (key === "Enter") {
+            onSearch(value)
+        }
+    }
+
     return (
         <OuterLayer >
             <SearchBarContainer>
-                <input value={value} onChange={(e) => setValue(e.target.value)} type="text" placeholder='Search...' />
-                {/* <button onClick={() => setIsExpanded(!isExpanded)} >{isExpanded ? '-' : '+'}</button> */}
+                <input onKeyDown={(e) => handleOnEnter(e.key)} value={value} onChange={(e) => setValue(e.target.value)} type="text" placeholder='Search...' />
             </SearchBarContainer>
-            {/* {
-                isExpanded &&
-                <FilterContainer>
-                    <FilterButton rangeLimiters={{ min: 1, max: 20 }} defaultPlaceholder='How many players?' unit='players' />
-                    <FilterButton rangeLimiters={{ min: 5, max: 200 }} step={5} defaultPlaceholder='How much time?' unit='minutes' />
-                    <FilterButton rangeLimiters={{ min: 1, max: 10 }} step={0.5} defaultPlaceholder='With a minimium personal score?' />
-                </FilterContainer>
-            } */}
             <SearchButton onClick={() => { onSearch(value) }}>
                 Search
             </SearchButton>

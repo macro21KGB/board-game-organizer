@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Controller from "../controller";
 import { toast } from "react-toastify";
+import { FABButton } from "../components/FabAdd";
 
 const DetailContainer = styled.div`
     position: relative;
@@ -150,29 +151,23 @@ export default function DetailRoute() {
     });
 
     const addExtensionToGame = (extensionId: string) => {
-        let extensionAlreadyAdded = false;
         if (extensionId === "") {
             toast.error("Please select an extension");
             return;
         }
 
-        game.extensions.forEach((extension) => {
-            if (extension.key === extensionId) {
-                toast.error("Extension already added");
-                extensionAlreadyAdded = true;
-                return;
-            }
-        })
-
-        if (!extensionAlreadyAdded)
-            addExtensionMutation.mutate(extensionId);
+        addExtensionMutation.mutate(extensionId);
     }
 
     const { playTime, players, name, extensions, isExtension, hasExtensions } = game;
 
+    const gotToModify = () => {
+        navigate(`/add`, { state: { game } });
+    }
+
     return (
         <DetailContainer>
-
+            <FABButton onClick={gotToModify} backgroundFabColor="orange" icon="modify" />
             <div>
                 <div id="name-back">
                     <h1>{name}</h1>
@@ -250,6 +245,9 @@ export default function DetailRoute() {
                     <option value="">Select an extension</option>
                     {
                         allExtensionsQuery.data?.map((extension) => {
+                            if (game.extensions.map((ext) => ext.key).includes(extension.key))
+                                return null;
+
                             return (
                                 <option key={extension.key} value={extension.key}>{extension.name}</option>
                             )

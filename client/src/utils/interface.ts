@@ -6,6 +6,7 @@ export interface FilterRange {
 }
 
 
+
 export type ExtensionType = Pick<Game, "key" | "name" | "slug" | "score" | "imageUrl">;
 
 export interface ResponsePayload {
@@ -50,3 +51,7 @@ export const gameSchema = z.object({
 });
 
 export type Game = z.infer<typeof gameSchema>;
+
+
+const modifyGameHookSchema = z.tuple([z.boolean(), gameSchema.optional().nullable()]);
+export type ModifyGameHook = z.infer<typeof modifyGameHookSchema>;

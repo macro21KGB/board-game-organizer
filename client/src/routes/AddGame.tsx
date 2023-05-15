@@ -2,11 +2,12 @@ import FilterButton from "../components/FilterButton";
 import styled from "styled-components";
 import InputBox from "../components/InputBox";
 import WelcomePanel from "../components/WelcomePanel";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { FilterRange, Game, gameSchema } from "../utils/interface";
 import { fromZodError } from 'zod-validation-error';
 import { notify } from "../utils/utils";
 import { useNavigate } from "react-router-dom";
+import { useGameToModify } from "../utils/hooks";
 import { nanoid } from "nanoid";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Controller from "../controller"
@@ -67,13 +68,13 @@ const BasicButton = styled.button<{ bgcolor?: string }>`
     }
 `;
 
-const PhotoPreview = styled.img`
-    width: 100%;
-    max-height: 500px;
-    object-fit: cover;
-    border-radius: 7px;
-    cursor: pointer;
-`;
+// const PhotoPreview = styled.img`
+//     width: 100%;
+//     max-height: 500px;
+//     object-fit: cover;
+//     border-radius: 7px;
+//     cursor: pointer;
+// `;
 
 const LabelFormControl = styled.label`
     font-family: system-ui, sans-serif;
@@ -136,8 +137,8 @@ type FilterRangeWithName = FilterRange & { name: string };
 export default function AddGameRoute() {
 
     const [gameName, setGameName] = useState<string>('');
-    const photoRef = useRef<HTMLImageElement | null>(null);
-    const [photo, setPhoto] = useState<Blob | File | null>(null);
+    // const photoRef = useRef<HTMLImageElement | null>(null);
+    const [photo] = useState<Blob | File | null>(null);
     const [score, setScore] = useState<string>("");
     const [hasExtensions, setHasExtensions] = useState<boolean>(false);
     const [isExtension, setIsExtension] = useState<boolean>(false);
@@ -147,11 +148,28 @@ export default function AddGameRoute() {
     const queryClient = useQueryClient();
     const controller = Controller.getInstance();
 
+    const [isModifingGame, gameToModify] = useGameToModify();
+
     const [parentTogglers] = useAutoAnimate();
 
     const addGameMutation = useMutation((data: FormData) => {
         return controller.addGame(data);
     });
+
+    useEffect(() => {
+
+        if (gameToModify) {
+            setGameName(gameToModify.name);
+            setScore(gameToModify.score.toString());
+            setHasExtensions(gameToModify.hasExtensions);
+            setIsExtension(gameToModify.isExtension);
+            setRanges([
+                { name: 'players', min: gameToModify.players.min, max: gameToModify.players.max },
+                { name: 'playTime', min: gameToModify.playTime.min, max: gameToModify.playTime.max }
+            ]);
+        }
+
+    }, [])
 
     const tryToAddGame = () => {
 
@@ -209,32 +227,36 @@ export default function AddGameRoute() {
 
     }
 
+    // const saveAndPreviewPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const file = event.target.files?.[0];
+    //     if (file) {
 
-    const saveAndPreviewPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
+    //         const compressedPhoto = await imageCompression(file, {
+    //             maxSizeMB: 1,
+    //             maxWidthOrHeight: 500,
+    //         })
+    //         setPhoto(compressedPhoto);
+    //         const reader = new FileReader();
+    //         reader.onload = (e) => {
+    //             if (photoRef.current) {
+    //                 photoRef.current.src = e.target?.result as string;
 
-            const compressedPhoto = await imageCompression(file, {
-                maxSizeMB: 1,
-                maxWidthOrHeight: 500,
-            })
-            setPhoto(compressedPhoto);
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                if (photoRef.current) {
-                    photoRef.current.src = e.target?.result as string;
-
-                }
-            }
-            reader.readAsDataURL(file);
-            console.log(photo);
-        }
-    }
+    //             }
+    //         }
+    //         reader.readAsDataURL(file);
+    //         console.log(photo);
+    //     }
+    // }
 
     return (
         <AddGameContainer>
             <div id="top-bar">
-                <WelcomePanel title="Add" subtitle="a new game" />
+                {
+                    isModifingGame ?
+                        <WelcomePanel title="Modify" subtitle={gameToModify?.name!} />
+                        : <WelcomePanel title="Add" subtitle="a new game" />
+
+                }
                 <div id="buttons">
                     <BasicButton onClick={() => { tryToAddGame() }} >Add the game</BasicButton>
                     <BasicButton bgcolor="orange" onClick={() => { navigate("/") }} >Go Back</BasicButton>
@@ -273,8 +295,8 @@ export default function AddGameRoute() {
                 </LabelFormControl>
             </div>
 
-            <input type="file" name="photo" onChange={saveAndPreviewPhoto} />
-            <PhotoPreview ref={photoRef} src="none" alt="preview" />
+            {/* <input type="file" name="photo" onChange={saveAndPreviewPhoto} />
+            <PhotoPreview ref={photoRef} src="none" alt="preview" /> */}
         </AddGameContainer>
     )
 }
