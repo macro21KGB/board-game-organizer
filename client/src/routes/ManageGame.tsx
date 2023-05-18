@@ -68,14 +68,6 @@ const BasicButton = styled.button<{ bgcolor?: string }>`
     }
 `;
 
-// const PhotoPreview = styled.img`
-//     width: 100%;
-//     max-height: 500px;
-//     object-fit: cover;
-//     border-radius: 7px;
-//     cursor: pointer;
-// `;
-
 const LabelFormControl = styled.label`
     font-family: system-ui, sans-serif;
     font-size: 1.5rem;
@@ -137,8 +129,6 @@ type FilterRangeWithName = FilterRange & { name: string };
 export default function AddGameRoute() {
 
     const [gameName, setGameName] = useState<string>('');
-    // const photoRef = useRef<HTMLImageElement | null>(null);
-    const [photo] = useState<Blob | File | null>(null);
     const [score, setScore] = useState<string>("");
     const [hasExtensions, setHasExtensions] = useState<boolean>(false);
     const [isExtension, setIsExtension] = useState<boolean>(false);
@@ -156,6 +146,10 @@ export default function AddGameRoute() {
         return controller.addGame(data);
     });
 
+    const modifiyGameMutation = useMutation((game: Game) => {
+        return controller.modifyGame(game);
+    })
+
     useEffect(() => {
 
         if (gameToModify) {
@@ -171,7 +165,7 @@ export default function AddGameRoute() {
 
     }, [])
 
-    const tryToAddGame = () => {
+    const tryToAddModifyGame = () => {
 
         const playersRange = ranges.find(range => range.name === 'players');
         const playtimeRange = ranges.find(range => range.name === 'playTime');
@@ -182,7 +176,7 @@ export default function AddGameRoute() {
         };
 
         const newGame: Game = {
-            key: nanoid(10),
+            key: gameToModify ? gameToModify.key : nanoid(10),
             name: gameName,
             slug: gameName.toLowerCase(),
             players: {
@@ -201,23 +195,40 @@ export default function AddGameRoute() {
         }
 
         try {
-            const parsedGame = gameSchema.parse(newGame);
-            const formData = new FormData();
 
-            formData.set("game", JSON.stringify(parsedGame));
+            if (isModifingGame) {
+                const parsedGame = gameSchema.parse(newGame);
 
-            if (photo)
-                formData.set("photo", photo as Blob);
-            addGameMutation.mutate(formData, {
-                onSuccess: () => {
-                    queryClient.invalidateQueries(["games"]);
-                    notify("Game added successfully!", "success");
-                    // navigate("/");
-                },
-                onError: () => {
-                    notify("Can't add the game right now!", "error");
-                }
-            });
+                modifiyGameMutation.mutate(parsedGame, {
+                    onSuccess: () => {
+                        queryClient.invalidateQueries(["games"]);
+                        notify("Game modified successfully!", "success");
+                        navigate("/");
+                    },
+                    onError: () => {
+                        notify("Can't modify the game right now!", "error");
+                    }
+                });
+
+            }
+            else {
+
+                const parsedGame = gameSchema.parse(newGame);
+                const formData = new FormData();
+
+                formData.set("game", JSON.stringify(parsedGame));
+
+                addGameMutation.mutate(formData, {
+                    onSuccess: () => {
+                        queryClient.invalidateQueries(["games"]);
+                        notify("Game added successfully!", "success");
+                        navigate("/");
+                    },
+                    onError: () => {
+                        notify("Can't add the game right now!", "error");
+                    }
+                });
+            }
 
         } catch (err: any) {
             const validationError = fromZodError(err);
@@ -226,27 +237,6 @@ export default function AddGameRoute() {
 
 
     }
-
-    // const saveAndPreviewPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     const file = event.target.files?.[0];
-    //     if (file) {
-
-    //         const compressedPhoto = await imageCompression(file, {
-    //             maxSizeMB: 1,
-    //             maxWidthOrHeight: 500,
-    //         })
-    //         setPhoto(compressedPhoto);
-    //         const reader = new FileReader();
-    //         reader.onload = (e) => {
-    //             if (photoRef.current) {
-    //                 photoRef.current.src = e.target?.result as string;
-
-    //             }
-    //         }
-    //         reader.readAsDataURL(file);
-    //         console.log(photo);
-    //     }
-    // }
 
     return (
         <AddGameContainer>
@@ -258,7 +248,7 @@ export default function AddGameRoute() {
 
                 }
                 <div id="buttons">
-                    <BasicButton onClick={() => { tryToAddGame() }} >Add the game</BasicButton>
+                    <BasicButton onClick={() => { tryToAddModifyGame() }} >{isModifingGame ? 'Modify the game' : 'Add the game'}</BasicButton>
                     <BasicButton bgcolor="orange" onClick={() => { navigate("/") }} >Go Back</BasicButton>
                 </div>
             </div>
@@ -272,7 +262,11 @@ export default function AddGameRoute() {
                     }
                 ])
             }}
-                rangeLimiters={{ min: 1, max: 30 }} defaultPlaceholder='How many players?' unit='players' />
+                rangeLimiters={{ min: 1, max: 30 }}
+                range={gameToModify?.players}
+                defaultPlaceholder='How many players?'
+                unit='players'
+            />
             <FilterButton onRangeSelected={(currentRange) => {
                 setRanges([
                     ...ranges,
@@ -282,7 +276,12 @@ export default function AddGameRoute() {
                     }
                 ])
             }}
-                rangeLimiters={{ min: 5, max: 300 }} step={5} defaultPlaceholder='How much time?' unit='minutes' />
+                rangeLimiters={{ min: 5, max: 300 }}
+                step={5}
+                range={gameToModify?.playTime}
+                defaultPlaceholder='How much time?'
+                unit='minutes'
+            />
             <InputBox value={score} onChange={setScore} type="number" placeholder="How much do you rate this game?" />
             <div id="togglers" ref={parentTogglers}>
                 <LabelFormControl>
@@ -295,8 +294,6 @@ export default function AddGameRoute() {
                 </LabelFormControl>
             </div>
 
-            {/* <input type="file" name="photo" onChange={saveAndPreviewPhoto} />
-            <PhotoPreview ref={photoRef} src="none" alt="preview" /> */}
         </AddGameContainer>
     )
 }

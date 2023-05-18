@@ -3,6 +3,7 @@ import type { ExtensionType, Game, ResponsePayload } from './utils/interface';
 
 export default class Controller {
 
+
     private static _instance: Controller;
 
     private gameDao: GameDaoDetaImpl
@@ -40,6 +41,10 @@ export default class Controller {
     }
     public async getAllExtensions(): Promise<ExtensionType[]> {
         return await this.gameDao.getAllExtensions();
+    }
+
+    public async modifyGame(game: Game): Promise<boolean> {
+        return await this.gameDao.modifyGame(game);
     }
 
     public async addExtension(gameId: string, extensionId: string): Promise<ResponsePayload> {

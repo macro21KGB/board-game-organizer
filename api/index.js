@@ -37,14 +37,6 @@ app.post("/game", multer().single("photo"), async (req, res) => {
 
 });
 
-app.get("/photo/:key", async (req, res) => {
-    const photo = await photoGamesDb.get(req.params.key);
-    if (!photo) res.status(404).send({ success: false, message: "Photo not found" });
-
-    const buffer = await img.arrayBuffer();
-    res.send(Buffer.from(buffer));
-
-});
 
 app.get("/games", async (req, res) => {
 
@@ -82,6 +74,24 @@ app.get("/game/:id", async (req, res) => {
     if (!game) res.status(404).send({ success: false, message: "Game not found" });
 
     res.send(game);
+});
+
+// UPDATE GAME
+app.put("/game", async (req, res) => {
+    try {
+
+
+        const game = req.body['game'];
+
+        if (game === null) res.status(404).send(false);
+
+        gamesDb.put(game);
+        res.status(200).send(true)
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(false)
+    }
 });
 
 app.post("/extensions/:gameId/:extensionId", async (req, res) => {

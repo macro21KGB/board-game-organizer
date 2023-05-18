@@ -154,14 +154,14 @@ export default function FilterButton({ defaultPlaceholder, onRangeSelected, onCl
     const [currentRange, setCurrentRange] = useState<FilterRange | undefined>(range);
 
     // this is the range that the user is currently selecting
-    const [selectorRanges, setSelectorRanges] = useState<FilterRange>(rangeLimiters);
+    const [selectorRanges, setSelectorRanges] = useState<FilterRange>(range ?? rangeLimiters);
     const [parent] = useAutoAnimate();
 
     const handleClick = () => {
         onClick?.();
         setSelectingFilter(true);
     }
-    
+
     const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSelectorRanges({ ...selectorRanges, [e.target.name]: parseInt(e.target.value) });
     }

@@ -107,5 +107,24 @@ export class GameDaoDetaImpl {
             throw new Error(error);
         }
     }
+    async modifyGame(game: Game): Promise<boolean> {
+        try {
+            console.log(game);
+            const response = await axios.put<boolean>(`${getBaseUrl()}/game`, {
+                game: game,
+            }, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const dataResponse = response.data;
+
+            return dataResponse;
+        } catch (error: any) {
+            throw new Error(error);
+        }
+    }
+
 
 }

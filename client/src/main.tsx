@@ -7,7 +7,7 @@ import {
   createBrowserRouter,
   RouterProvider
 } from "react-router-dom";
-import AddGameRoute from './routes/AddGame.tsx'
+import AddGameRoute from './routes/ManageGame.tsx'
 import {
   QueryClient,
   QueryClientProvider,
