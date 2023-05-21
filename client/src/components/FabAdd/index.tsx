@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 
-const FABContainer = styled.button<{ backgroundFabColor?: string }>`
+const FABContainer = styled.button<{ backgroundfabcolor?: string }>`
     all: unset;
 
     position: fixed;
     bottom: 1rem;
     right: 1rem;
 
-    background-color: ${props => props.backgroundFabColor ?? props.theme.backgroundFabColor};
+    background-color: ${props => props.backgroundfabcolor ?? props.theme.backgroundFabColor};
 
     width: 3.5rem;
     height: 3.5rem;
@@ -53,7 +53,7 @@ export function FABButton({ onClick, backgroundFabColor, icon = "add" }: FABButt
     return (
         <>
 
-            <FABContainer backgroundFabColor={backgroundFabColor} onClick={onClick}>
+            <FABContainer backgroundfabcolor={backgroundFabColor} onClick={onClick}>
                 {icons[icon]} {/* 🗑️ ✏️ ➕ */}
             </FABContainer>
         </>

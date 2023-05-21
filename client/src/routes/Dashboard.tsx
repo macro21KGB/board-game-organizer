@@ -13,8 +13,13 @@ const GamesList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-`;
 
+  @media (min-width: 768px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+  }
+`;
 
 function App() {
   const controller = Controller.getInstance();
@@ -58,6 +63,11 @@ function App() {
           })
         }
       </GamesList>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
       <FABButton onClick={navigateToDetails} />
     </>
   )

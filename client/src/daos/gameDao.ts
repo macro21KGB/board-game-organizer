@@ -24,7 +24,7 @@ export class GameDaoDetaImpl {
         }
     }
     async getGames(filterName?: string): Promise<Game[]> {
-        const response = await fetch(`${getBaseUrl()}/games${filterName !== "" ? `?name=${filterName}` : ""}`, {
+        const response = await fetch(`${getBaseUrl()}/games${filterName !== undefined ? `?name=${filterName}` : ""}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -34,6 +34,7 @@ export class GameDaoDetaImpl {
         const data = await response.json() as Game[];
         return data;
     }
+
     async addGame(data: FormData): Promise<ResponsePayload> {
         const response = await axios.post<ResponsePayload>(`${getBaseUrl()}/game`, data, {
             headers: {

@@ -115,6 +115,29 @@ const BasicButton = styled.button<{ bgcolor?: string }>`
     }
 `;
 
+const LinkButtonToSite = styled.a`
+    all: unset;
+
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    border: 1px solid #223353;
+    padding: 1rem ;
+    border-radius: 9px;
+
+    &:hover {
+        background-color: #223353;
+    }
+
+    &:active {
+        background-color: #1C7A6B;
+    }
+
+
+`;
+
 export default function DetailRoute() {
 
     const game = useLoaderData() as Game;
@@ -255,7 +278,9 @@ export default function DetailRoute() {
                     }
                 </select>
             }
-
+            <LinkButtonToSite href={`https://boardgamegeek.com/geeksearch.php?action=search&q=${game.name.toLowerCase()}&objecttype=boardgame`}>
+                Search for this game on BoardGameGeek
+            </LinkButtonToSite>
         </DetailContainer>
     )
 }

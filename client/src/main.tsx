@@ -22,6 +22,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 const theme = {
   green: '#2A9D8F',
   backgroundColor: '#101F3D',
+  lighterBackgroundColor: '#394668',
   backgroundCardColor: '#263E6F',
   backgroundFabColor: '#E9C46A',
 }

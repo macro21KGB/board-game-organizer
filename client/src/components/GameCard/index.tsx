@@ -6,6 +6,8 @@ const GameCardContainer = styled.div`
     position: relative;
     display: flex;
     flex-direction: row;
+    min-width: 400px;
+    min-height: 120px;
     justify-content: flex-start;
     gap: 0.5rem;
     background-color: ${props => props.theme.backgroundCardColor};

@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+import { MenuButton } from '../MenuButton';
+import Drawer from '../Drawer';
+import { createPortal } from 'react-dom';
 
 const OuterLayer = styled.div`
     display: flex;
@@ -11,9 +14,9 @@ const OuterLayer = styled.div`
 const SearchBarContainer = styled.div`
     display: flex;
     flex-direction: row;
-
+    flex: 1;
     border: 1px solid #223353;
-    padding: 1rem ;
+    padding: 1rem;
     border-radius: 9px;
 
     & > input {
@@ -57,12 +60,13 @@ const SearchButton = styled.button`
     }
 `;
 
-// const FilterContainer = styled.div`
-//     display: flex;
-//     flex-direction: column;
-//     gap: 0.5rem;
 
-// `;
+const SearchBarMenuContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    width: 100%;
+`;
 
 interface SearchBarProps {
     onSearch: (search: string) => void;
@@ -71,6 +75,7 @@ interface SearchBarProps {
 export default function SearchBar({ onSearch }: SearchBarProps) {
 
     const [value, setValue] = useState("");
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const handleOnEnter = (key: string) => {
         if (key === "Enter") {
@@ -80,9 +85,13 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
 
     return (
         <OuterLayer >
-            <SearchBarContainer>
-                <input onKeyDown={(e) => handleOnEnter(e.key)} value={value} onChange={(e) => setValue(e.target.value)} type="text" placeholder='Search...' />
-            </SearchBarContainer>
+            {menuOpen && createPortal(<Drawer onClose={() => setMenuOpen(false)} />, document.body)}
+            <SearchBarMenuContainer>
+                <SearchBarContainer>
+                    <input onKeyDown={(e) => handleOnEnter(e.key)} value={value} onChange={(e) => setValue(e.target.value)} type="text" placeholder='Search...' />
+                </SearchBarContainer>
+                <MenuButton onClick={() => { setMenuOpen(true) }} />
+            </SearchBarMenuContainer>
             <SearchButton onClick={() => { onSearch(value) }}>
                 Search
             </SearchButton>
