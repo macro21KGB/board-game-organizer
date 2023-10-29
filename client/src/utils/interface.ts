@@ -5,8 +5,6 @@ export interface FilterRange {
     max: number;
 }
 
-
-
 export type ExtensionType = Pick<Game, "key" | "name" | "slug" | "score" | "imageUrl">;
 
 export interface ResponsePayload {

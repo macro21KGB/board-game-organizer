@@ -18,12 +18,6 @@ const FilterContainer = styled.div<{ selected: boolean }>`
         color: white;
     }
     
-    ${props => props.selected && `
-        background-color: white;
-        color: black;
-    `
-    }
-
     `;
 
 const InputRangeItem = styled("input") <{ type: "range" }>`
@@ -45,18 +39,19 @@ const InputRangeItem = styled("input") <{ type: "range" }>`
         width: 1rem;
         height: 1rem;
         border-radius: 8px;
-        background-color: #223353;
+        background-color: #ffffff;
         cursor: pointer;
+        margin-top: -0.25rem;
 
     }
-
+    
     &::-moz-range-thumb {
         width: 1rem;
         height: 1rem;   
         border-radius: 8px;
-        background-color: #223353;
+        background-color: #ffffff;
         cursor: pointer;
-
+        margin-top: -0.25rem;
         
     }
 
@@ -65,9 +60,9 @@ const InputRangeItem = styled("input") <{ type: "range" }>`
         width: 0.5rem;
         height: 1rem;
         border-radius: 8px;
-        background-color: #223353;
+        background-color: #ffffff;
         cursor: pointer;
-
+        margin-top: -0.25rem;
         
     }
 

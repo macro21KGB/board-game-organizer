@@ -2,6 +2,10 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+
+    --primary: #101F3D;
+    --green-accent: #2a9d8f;
+    --orange-accent: #ffa500;
 }
 
 html,

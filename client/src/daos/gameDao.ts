@@ -5,7 +5,6 @@ import { getBaseUrl } from "../utils/utils";
 
 export class GameDaoDetaImpl {
 
-
     async getGame(gameId: string): Promise<Game> {
         try {
             const response = axios.get<Game | string>(`${getBaseUrl()}/game/${gameId}`, {
@@ -23,16 +22,15 @@ export class GameDaoDetaImpl {
             throw new Error(error);
         }
     }
-    async getGames(filterName?: string): Promise<Game[]> {
-        const response = await fetch(`${getBaseUrl()}/games${filterName !== undefined ? `?name=${filterName}` : ""}`, {
-            method: 'GET',
+    async getGames(filterName?: string, onlyGames: boolean = false): Promise<Game[]> {
+        const composedQuery = `${getBaseUrl()}/games${filterName !== undefined ? `?name=${filterName}` : ""}${onlyGames !== undefined ? `&onlyGames=${onlyGames}` : ""}`
+        const response = await axios.get<Game[]>(composedQuery, {
             headers: {
                 'Content-Type': 'application/json'
             }
-        })
+        });
 
-        const data = await response.json() as Game[];
-        return data;
+        return response.data;
     }
 
     async addGame(data: FormData): Promise<ResponsePayload> {
@@ -127,5 +125,19 @@ export class GameDaoDetaImpl {
         }
     }
 
+    async removeGame(gameId: string): Promise<boolean> {
+        try {
+            const response = await axios.delete<boolean>(`${getBaseUrl()}/game/${gameId}`, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
 
+            const dataResponse = response.data;
+
+            return dataResponse;
+        } catch (error: any) {
+            throw new Error(error);
+        }
+    }
 }

@@ -20,8 +20,8 @@ export default class Controller {
     }
 
 
-    public async getGames(filterName?: string): Promise<Game[]> {
-        return await this.gameDao.getGames(filterName);
+    public async getGames(filterName?: string, onlyGames: boolean = false): Promise<Game[]> {
+        return await this.gameDao.getGames(filterName, onlyGames);
     }
 
     public async getGame(gameId: string): Promise<Game> {
@@ -49,5 +49,9 @@ export default class Controller {
 
     public async addExtension(gameId: string, extensionId: string): Promise<ResponsePayload> {
         return await this.gameDao.addExtensionToGame(gameId, extensionId);
+    }
+
+    public async removeGame(gameId: string): Promise<boolean> {
+        return await this.gameDao.removeGame(gameId);
     }
 }

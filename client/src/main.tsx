@@ -34,12 +34,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/add",
-    element: <AddGameRoute />,
-    loader: (props) => {
-      console.log(props)
-
-      return null;
-    }
+    element: <AddGameRoute />
   },
   {
     path: "/details/:key",

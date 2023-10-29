@@ -21,6 +21,8 @@ const AddGameContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
+    max-width: 800px;
+    margin: 0 auto;
 
     #top-bar {
         display: flex;
@@ -249,6 +251,15 @@ export default function AddGameRoute() {
                 }
                 <div id="buttons">
                     <BasicButton onClick={() => { tryToAddModifyGame() }} >{isModifingGame ? 'Modify the game' : 'Add the game'}</BasicButton>
+                    {
+                        isModifingGame &&
+                        <BasicButton bgcolor="red" onClick={() => {
+                            controller.removeGame(gameToModify!.key);
+                            queryClient.invalidateQueries(["games"]);
+                            notify("Game removed successfully!", "success");
+                            navigate("/");
+                        }} >Remove the game</BasicButton>
+                    }
                     <BasicButton bgcolor="orange" onClick={() => { navigate("/") }} >Go Back</BasicButton>
                 </div>
             </div>

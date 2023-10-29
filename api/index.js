@@ -44,14 +44,15 @@ app.get("/games", async (req, res) => {
     * @type {Array} games
     */
     let games = [];
-
+    const queries = {};
     if (req.query['name']) {
-        console.log(req.query['name']);
-        games = (await gamesDb.fetch({ "slug?contains": req.query['name'] })).items;
+        queries["slug?contains"] = req.query['name'];
     }
-    else {
-        games = (await gamesDb.fetch()).items;
-    }
+    if (req.query['onlyGames'] && req.query['onlyGames'] !== 'false')
+        queries['isExtension'] = false;
+    console.log(queries)
+
+    games = (await gamesDb.fetch(queries)).items;
 
     res.send(games);
 });
@@ -108,6 +109,22 @@ app.post("/extensions/:gameId/:extensionId", async (req, res) => {
     gamesDb.put(game);
 
     res.status(200).send({ success: true, message: "Extension added" });
+});
+
+app.delete("/game/:gameId", async (req, res) => {
+    try {
+        const game = await gamesDb.get(req.params.gameId);
+
+        if (!game) res.status(404).send({ success: false, message: "Game not found" });
+
+        await gamesDb.delete(req.params.gameId);
+
+        res.status(200).send({ success: true, message: "Game deleted" });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ success: false, message: "Error deleting game" });
+    }
 });
 
 app.listen(port, () => {
