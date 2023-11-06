@@ -111,6 +111,7 @@ function App() {
           refreshAndShowOnlyGames()
           notify(!showOnlyGames ? "Showing only games" : "Showing games and extensions")
         }} />
+
         <label htmlFor="filter">Show only games</label>
       </AdditionalFilter>
       <br />

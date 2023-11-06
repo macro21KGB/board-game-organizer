@@ -2,8 +2,21 @@ import { ExtensionType, Game, ResponsePayload } from "../utils/interface";
 import axios from "axios";
 import { getBaseUrl } from "../utils/utils";
 
+interface GameDao {
+    getGame(gameId: string): Promise<Game>;
+    getGames(filterName?: string, onlyGames?: boolean): Promise<Game[]>;
+    addGame(data: FormData): Promise<ResponsePayload>;
+    getPhoto(gameKey: string): Promise<string>;
+    updateGame(game: Game): Promise<Game>;
+    deleteGame(gameId: string): Promise<Game>;
+    getGameExtensions(gameId: string): Promise<ExtensionType[]>;
+    getAllExtensions(): Promise<ExtensionType[]>;
+    addExtensionToGame(gameId: string, extensionId: string): Promise<ResponsePayload>;
+    modifyGame(game: Game): Promise<boolean>;
+    removeGame(gameId: string): Promise<boolean>;
+}
 
-export class GameDaoDetaImpl {
+export class GameDaoDetaImpl implements GameDao {
 
     async getGame(gameId: string): Promise<Game> {
         try {
