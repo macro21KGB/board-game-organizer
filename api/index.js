@@ -24,7 +24,7 @@ app.post("/game", multer().single("photo"), async (req, res) => {
         const fileToUpload = req.file ?? null;
 
         gamesDb.put(game);
-
+        // TODO qui
         if (fileToUpload !== null)
             photoGamesDb.put(game.key, { data: fileToUpload.buffer });
 
@@ -67,14 +67,19 @@ app.get("/extensions", async (req, res) => {
 // GET GAME
 app.get("/game/:id", async (req, res) => {
 
-    /**
-     * @type {{extensions: string[]}} game
-     */
-    const game = await gamesDb.get(req.params.id);
+    try {
+        /**
+         * @type {{extensions: string[]}} game
+         */
+        const game = await gamesDb.get(req.params.id);
 
-    if (!game) res.status(404).send({ success: false, message: "Game not found" });
+        if (!game) res.status(404).send({ success: false, message: "Game not found" });
 
-    res.send(game);
+        res.send(game);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ success: false, message: "Error getting game" })
+    }
 });
 
 // UPDATE GAME
@@ -104,8 +109,9 @@ app.post("/extensions/:gameId/:extensionId", async (req, res) => {
     game.extensions.push({
         key: extension.key,
         name: extension.name,
+        parentKey: game.key,
     });
-
+    console.log(game.extensions);
     gamesDb.put(game);
 
     res.status(200).send({ success: true, message: "Extension added" });
@@ -115,9 +121,29 @@ app.delete("/game/:gameId", async (req, res) => {
     try {
         const game = await gamesDb.get(req.params.gameId);
 
+        // se il gioco è un estensione, rimuovo il riferimento dal gioco padre
+        if (game.isExtension) {
+            const allGames = (await gamesDb.fetch({})).items;
+            allGames.forEach(async (game) => {
+                if (game.extensions) {
+                    const extensions = game.extensions.filter((extension) => extension.key !== req.params.gameId);
+                    game.extensions = extensions;
+                    await gamesDb.put(game);
+                }
+            });
+
+            await gamesDb.delete(req.params.gameId);
+            return res.status(200).send({ success: true, message: "Extension deleted" });
+        }
+
+        const extensionsToDelete = game.extensions ?? [];
         if (!game) res.status(404).send({ success: false, message: "Game not found" });
 
+        // Deletion of game and extensions
         await gamesDb.delete(req.params.gameId);
+        extensionsToDelete.forEach(async (extension) => {
+            await gamesDb.delete(extension.key);
+        });
 
         res.status(200).send({ success: true, message: "Game deleted" });
 

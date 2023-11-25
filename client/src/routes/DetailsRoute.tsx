@@ -138,6 +138,11 @@ const LinkButtonToSite = styled.a`
 
 `;
 
+type ExtensionToAdd = {
+    key: string,
+    name: string
+}
+
 export default function DetailRoute() {
 
     const game = useLoaderData() as Game;
@@ -149,14 +154,13 @@ export default function DetailRoute() {
     }
 
     const [isAddingExtension, setIsAddingExtension] = useState(false);
-    const [extensionId, setExtensionId] = useState("");
+    const [extensionToAdd, setExtensionToAdd] = useState<ExtensionToAdd>();
+    const [extensions, setExtensions] = useState(game.extensions);
 
     const controller = Controller.getInstance();
 
     const allExtensionsQuery = useQuery(["allExtensions"], () => {
         return controller.getAllExtensions();
-    }, {
-        enabled: isAddingExtension
     })
 
     const addExtensionMutation = useMutation((extensionId: string) => {
@@ -166,6 +170,8 @@ export default function DetailRoute() {
             toast.success("Extension added");
             setIsAddingExtension(false);
             queryClient.invalidateQueries(["games"]);
+            setExtensions([...extensions, extensionToAdd!]);
+            setExtensionToAdd(undefined);
         },
         onError: (error: any) => {
             toast.error(error.message);
@@ -173,16 +179,16 @@ export default function DetailRoute() {
 
     });
 
-    const addExtensionToGame = (extensionId: string) => {
-        if (extensionId === "") {
+    const addExtensionToGame = (extension: ExtensionToAdd) => {
+        if (extension.key === "") {
             toast.error("Please select an extension");
             return;
         }
 
-        addExtensionMutation.mutate(extensionId);
+        addExtensionMutation.mutate(extension.key);
     }
 
-    const { playTime, players, name, extensions, isExtension, hasExtensions } = game;
+    const { playTime, players, name, isExtension, hasExtensions } = game;
 
     const gotToModify = () => {
         navigate(`/add`, { state: { game } });
@@ -240,7 +246,7 @@ export default function DetailRoute() {
                     <ExtensionSection>
                         <h3>Extensions</h3>
                         {
-                            game.extensions.map((extension) => {
+                            extensions.map((extension) => {
                                 return (
                                     <Link key={extension.key} to={`/details/${extension.key}`}>
                                         {extension.name}
@@ -251,7 +257,7 @@ export default function DetailRoute() {
                     </ExtensionSection>
                     <BasicButton onClick={() => {
                         if (isAddingExtension) {
-                            addExtensionToGame(extensionId);
+                            addExtensionToGame(extensionToAdd!);
                         }
                         else {
                             setIsAddingExtension(true)
@@ -264,7 +270,10 @@ export default function DetailRoute() {
             }
             {
                 isAddingExtension &&
-                <select onChange={(e) => setExtensionId(e.target.value)}>
+                <select onChange={(e) => setExtensionToAdd({
+                    key: e.target.value,
+                    name: e.target.selectedOptions[0].innerText
+                })}>
                     <option value="">Select an extension</option>
                     {
                         allExtensionsQuery.data?.map((extension) => {
