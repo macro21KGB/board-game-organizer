@@ -5,15 +5,11 @@ const app = express();
 const port = process.env.PORT || 5000;
 const multer = require("multer");
 const bodyParser = require("body-parser");
+const extensions = require("./extensions.js");
 
 app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-
-app.get("/", (req, res) => {
-    res.send("Hello from Space! 🚀");
-});
 
 
 // ADD GAME
@@ -57,12 +53,7 @@ app.get("/games", async (req, res) => {
     res.send(games);
 });
 
-app.get("/extensions", async (req, res) => {
-    const extensions = (await gamesDb.fetch({ "isExtension": true })).items;
-
-    res.send(extensions);
-});
-
+app.use("/extensions", extensions)
 
 // GET GAME
 app.get("/game/:id", async (req, res) => {
@@ -100,23 +91,8 @@ app.put("/game", async (req, res) => {
     }
 });
 
-app.post("/extensions/:gameId/:extensionId", async (req, res) => {
-    const game = await gamesDb.get(req.params.gameId);
-    const extension = await gamesDb.get(req.params.extensionId);
 
-    if (!game || !extension) res.status(404).send({ success: false, message: "Game or extension not found" });
-
-    game.extensions.push({
-        key: extension.key,
-        name: extension.name,
-        parentKey: game.key,
-    });
-    console.log(game.extensions);
-    gamesDb.put(game);
-
-    res.status(200).send({ success: true, message: "Extension added" });
-});
-
+// DELETE GAME
 app.delete("/game/:gameId", async (req, res) => {
     try {
         const game = await gamesDb.get(req.params.gameId);
@@ -131,7 +107,6 @@ app.delete("/game/:gameId", async (req, res) => {
                     await gamesDb.put(game);
                 }
             });
-
             await gamesDb.delete(req.params.gameId);
             return res.status(200).send({ success: true, message: "Extension deleted" });
         }
@@ -153,6 +128,8 @@ app.delete("/game/:gameId", async (req, res) => {
     }
 });
 
+
+// LISTEN AND SERVE API
 app.listen(port, () => {
     console.log(`App listening on port ${port}!`);
 });
